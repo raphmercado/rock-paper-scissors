@@ -13,24 +13,27 @@ function getComputerChoice() {
 function playRound(playerSelection, computerSelection) {
   const choices = playerSelection.concat(computerSelection);
   console.log(`Computer: ${computerSelection}\nPlayer: ${playerSelection}`);
-  //let isWin = true;
+  let isWin = "You Win!";
   switch (choices) {
     case "rockscissors":
     case "paperrock":
     case "scissorspaper":
-      //return isWin;
-      return console.log("Win!");
+      break;
+    // return console.log("Win!");
     case "rockpaper":
     case "paperscissors":
     case "scissorsrock":
-      //return isWin = false;
-      return console.log("Lose!");
+      isWin = "You Lose!";
+      break;
+    // return console.log("Lose!");
     case "rockrock":
     case "paperpaper":
     case "scissorsscissors":
-      //return isWin = "Draw";
-      return console.log("Draw!");
+      isWin = "Draw";
+      break;
+    // return console.log("Draw!");
   }
+  results(isWin, playerSelection, computerSelection);
 }
 
 function getPlayerChoice(e) {
@@ -38,8 +41,38 @@ function getPlayerChoice(e) {
   playRound(playerChoice, getComputerChoice());
 }
 
-const buttons = document.querySelectorAll(".btn");
-buttons.forEach(button => button.addEventListener('click', getPlayerChoice));
+function disableButton(btn) {
+  return btn.disabled = true;
+}
+
+function enableButton(btn) {
+  return btn.disabled = false;
+}
+
+function results(result, playerSelection, computerSelection) {
+  const results = document.querySelector(".results");
+  const para = document.createElement("p");
+  const btn = document.createElement("button");
+  const btnChoices = document.querySelectorAll(".btn-choice");
+  btn.textContent = "Play Again";
+  para.textContent = `You: ${playerSelection} | Computer: ${computerSelection} | ${result}`;
+  results.appendChild(para);
+  results.appendChild(btn);
+  btnChoices.forEach(btn => disableButton(btn));
+  btn.addEventListener('click', function (e) {
+    results.removeChild(para);
+    results.removeChild(btn);
+    btnChoices.forEach(btn => enableButton(btn));
+  })
+}
+
+function main() {
+  const buttons = document.querySelectorAll(".btn-choice");
+  buttons.forEach(button => button.addEventListener('click', getPlayerChoice));
+}
+
+main();
+
 
 /*function playGame() {
   let round = 5;
