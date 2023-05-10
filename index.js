@@ -13,32 +13,28 @@ function getComputerChoice() {
 function playRound(playerSelection, computerSelection) {
   const choices = playerSelection.concat(computerSelection);
   console.log(`Computer: ${computerSelection}\nPlayer: ${playerSelection}`);
-  let isWin = "You Win!";
+  let result;
+  let win = "win";
+  let lose = "lose";
+  let draw = "draw";
   switch (choices) {
     case "rockscissors":
     case "paperrock":
     case "scissorspaper":
+      result = win;
       break;
-    // return console.log("Win!");
     case "rockpaper":
     case "paperscissors":
     case "scissorsrock":
-      isWin = "You Lose!";
+      result = lose;
       break;
-    // return console.log("Lose!");
     case "rockrock":
     case "paperpaper":
     case "scissorsscissors":
-      isWin = "Draw";
+      result = draw;
       break;
-    // return console.log("Draw!");
   }
-  results(isWin, playerSelection, computerSelection);
-}
-
-function getPlayerChoice(e) {
-  const playerChoice = e.srcElement.id;
-  playRound(playerChoice, getComputerChoice());
+  return result;
 }
 
 function disableButton(btn) {
@@ -49,56 +45,68 @@ function enableButton(btn) {
   return btn.disabled = false;
 }
 
-function results(result, playerSelection, computerSelection) {
+function computeResult(result) {
+  switch (result) {
+    case "win":
+      playerPoints += 1;
+      break;
+    case "lose":
+      computerPoints += 1;
+      break;
+    case "draw":
+      break;
+  }
+  displayResult()
+}
+
+function displayResult() {
   const results = document.querySelector(".results");
-  const para = document.createElement("p");
+  const playerTotalPoints = document.querySelector(".points-player");
+  const computerTotalPoints = document.querySelector(".points-computer");
   const btn = document.createElement("button");
   const btnChoices = document.querySelectorAll(".btn-choice");
-  btn.textContent = "Play Again";
-  para.textContent = `You: ${playerSelection} | Computer: ${computerSelection} | ${result}`;
-  results.appendChild(para);
-  results.appendChild(btn);
-  btnChoices.forEach(btn => disableButton(btn));
-  btn.addEventListener('click', function (e) {
-    results.removeChild(para);
-    results.removeChild(btn);
-    btnChoices.forEach(btn => enableButton(btn));
-  })
+  playerTotalPoints.textContent = `Player: ${playerPoints}`;
+  computerTotalPoints.textContent = `Computer: ${computerPoints}`;
+  if (playerPoints < 5 && computerPoints < 5) {
+    btn.textContent = "Next Round";
+    results.appendChild(btn);
+    btnChoices.forEach(btn => disableButton(btn));
+    btn.addEventListener('click', function () {
+      results.removeChild(btn);
+      btnChoices.forEach(btn => enableButton(btn));
+    });
+  } else if (playerPoints === 5 || computerPoints === 5) {
+    const winner = document.createElement("p");
+    btnChoices.forEach(btn => disableButton(btn));
+    if (playerPoints > computerPoints) {
+      winner.textContent = "Player Wins!";
+    } else if (playerPoints < computerPoints) {
+      winner.textContent = "Computer wins!";
+    }
+    btn.textContent = "Play Again";
+    results.appendChild(winner);
+    results.appendChild(btn);
+    btn.addEventListener('click', function () {
+      playerPoints = 0;
+      computerPoints = 0;
+      playerTotalPoints.textContent = `Player: ${playerPoints}`;
+      computerTotalPoints.textContent = `Computer: ${computerPoints}`;
+      results.removeChild(winner);
+      results.removeChild(btn);
+      btnChoices.forEach(btn => enableButton(btn));
+    });
+  }
 }
 
 function main() {
   const buttons = document.querySelectorAll(".btn-choice");
-  buttons.forEach(button => button.addEventListener('click', getPlayerChoice));
+  buttons.forEach(button => button.addEventListener('click', function (e) {
+    const playerChoice = e.target.id;
+    roundResult = playRound(playerChoice, getComputerChoice());
+    computeResult(roundResult);
+  }));
 }
 
+let playerPoints = 0;
+let computerPoints = 0;
 main();
-
-
-/*function playGame() {
-  let round = 5;
-  let playerSelection;
-  let computerSelection;
-  let playerScore = 0;
-  let computerScore = 0;
-  for (let i = 1; i <= round; i++) {
-playerSelection = prompt(`Round ${i}\nEnter your play (Rock | Paper | Scissors): `);
-computerSelection = getComputerChoice();
-let isRoundWin = playRound(playerSelection, computerSelection);
-if (isRoundWin === true) {
-  playerScore += 1;
-  alert(`You Win! ${playerSelection[0].toUpperCase()}${playerSelection.slice(1).toLowerCase()} beats ${computerSelection}\nScore:\nPlayer: ${playerScore} | Computer: ${computerScore}\n`);
-} else if (isRoundWin === false) {
-  computerScore += 1;
-  alert(`You Lose! ${playerSelection[0].toUpperCase()}${playerSelection.slice(1).toLowerCase()} loses to ${computerSelection}\nScore:\nPlayer: ${playerScore} | Computer: ${computerScore}\n`);
-} else if (isRoundWin === "Draw") {
-  alert(`Draw!\nScore:\nPlayer: ${playerScore} | Computer: ${computerScore}\n`);
-}
-} if (playerScore > computerScore) {
-alert("Game Over! You Win!");
-} else if (playerScore < computerScore) {
-alert("Game Over! You Lose. Better luck next time!");
-} else if (playerScore === computerScore) {
-alert("Game Over! It's a Draw!");
-}
-}
-playGame();*/
